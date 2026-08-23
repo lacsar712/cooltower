@@ -182,19 +182,19 @@ func (a *App) RunOnce(ctx context.Context) error {
 		return err
 	}
 	fans := a.fanCoord.Assignments()
-	sprays := a.sprayPlant.Assignments()
 	for i := range fans {
 		bank, ok := a.fanCoord.Bank(fans[i].Fan)
 		if !ok {
 			continue
 		}
-		if i >= len(sprays) {
+		sprayHdr, ok := a.guard.SpraysFor(fans[i].Fan)
+		if !ok {
 			continue
 		}
-		if err := a.guard.Permit(fans[i].Fan, sprays[i].Header); err != nil {
+		if err := a.guard.Permit(fans[i].Fan, sprayHdr); err != nil {
 			return err
 		}
-		err := a.lock.WithLease(ctx, fans[i].Fan, sprays[i].Header, 30*time.Second, func() error {
+		err := a.lock.WithLease(ctx, fans[i].Fan, sprayHdr, 30*time.Second, func() error {
 			return bank.SetSpeed(70)
 		})
 		if err != nil {
