@@ -15,12 +15,12 @@ func (a *App) CalibrateSpray(ctx context.Context, segment model.SprayHeaderID, h
 	if err != nil {
 		return err
 	}
+	defer lease.Release()
 	if CalibrateProbe != nil {
 		if err := CalibrateProbe(ctx); err != nil {
 			return fmt.Errorf("calibrate: %w", err)
 		}
 	}
-	lease.Release()
 	return nil
 }
 
