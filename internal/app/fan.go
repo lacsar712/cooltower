@@ -6,6 +6,7 @@ import (
 
 	"github.com/lacsar712/cooltower/internal/clock"
 	"github.com/lacsar712/cooltower/internal/fan"
+	"github.com/lacsar712/cooltower/internal/model"
 )
 
 type FanRamp struct {
@@ -26,10 +27,18 @@ func NewFanRamp(clk clock.Clock, steps int, delay time.Duration) *FanRamp {
 
 func (r *FanRamp) Ramp(ctx context.Context, coord *fan.Coordinator) error {
 	for _, bank := range coord.Banks() {
+		// Honor an operator abort between staged banks: the cascade must stop
+		// accepting new stages once the cancel signal has propagated.
+		if err := ctx.Err(); err != nil {
+			return model.Wrap("fan_ramp", "canceled", err)
+		}
 		if err := bank.Start(ctx); err != nil {
 			return err
 		}
 		for step := 0; step < r.steps; step++ {
+			if err := ctx.Err(); err != nil {
+				return model.Wrap("fan_ramp", "canceled", err)
+			}
 			target := float64(step+1) * 100 / float64(r.steps)
 			if err := bank.SetSpeed(target); err != nil {
 				return err
@@ -37,7 +46,14 @@ func (r *FanRamp) Ramp(ctx context.Context, coord *fan.Coordinator) error {
 			if pc, ok := r.clk.(*clock.ProcessClock); ok {
 				pc.Step()
 			}
-			time.Sleep(r.delay)
+			// Wait between speed steps, but bail out the instant the operator
+			// revokes the ramp instead of running the remaining steps to full
+			// speed. time.Sleep would ignore the cancel entirely.
+			select {
+			case <-ctx.Done():
+				return model.Wrap("fan_ramp", "canceled", context.Cause(ctx))
+			case <-time.After(r.delay):
+			}
 		}
 	}
 	return nil
