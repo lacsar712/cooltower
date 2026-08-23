@@ -9,7 +9,8 @@ import (
 
 func (a *App) ReportDriftFault(ctx context.Context, ppm float64) error {
 	if ppm > a.cfg.DriftMaxPPM {
-		return fmt.Errorf("tower fault: %v", model.ErrDriftExceeded)
+		_ = a.alarms.Raise(ctx, "DRIFT_HIGH", a.TowerID(), 3)
+		return fmt.Errorf("tower fault: %w", model.ErrDriftExceeded)
 	}
 	return nil
 }
