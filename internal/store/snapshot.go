@@ -88,9 +88,8 @@ type DutySnapshot struct {
 
 func (d DutySnapshot) Clone() DutySnapshot {
 	out := DutySnapshot{TowerID: d.TowerID}
-	if len(d.SpraySlots) == 0 {
-		return out
-	}
-	out.SpraySlots = d.SpraySlots
+	slots := make([]model.SprayScheduleEntry, len(d.SpraySlots))
+	copy(slots, d.SpraySlots)
+	out.SpraySlots = slots
 	return out
 }
