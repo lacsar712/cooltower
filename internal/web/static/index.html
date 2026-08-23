@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cooltower HMI</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <h1>Cooltower</h1>
+    <p id="tower-id">—</p>
+  </header>
+  <main>
+    <section class="panel">
+      <h2>Tower State</h2>
+      <div class="metric"><span>State</span><strong id="state">—</strong></div>
+      <div class="metric"><span>Drift</span><strong id="drift">—</strong></div>
+      <div class="metric"><span>Fan Speed</span><strong id="fan-speed">—</strong></div>
+      <div class="metric"><span>Spray Flow</span><strong id="spray-flow">—</strong></div>
+      <div class="metric"><span>Basin Temp</span><strong id="basin-temp">—</strong></div>
+    </section>
+    <section class="panel">
+      <h2>Controls</h2>
+      <button id="btn-start">Start Cycle</button>
+      <button id="btn-stop" class="secondary">Stop</button>
+    </section>
+    <section class="panel wide">
+      <h2>Active Alarms</h2>
+      <ul id="alarms"></ul>
+    </section>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>
