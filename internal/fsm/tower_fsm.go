@@ -26,9 +26,8 @@ func (f *TowerFSM) State() model.TowerState { return f.state }
 func (f *TowerFSM) Apply(ctx context.Context, event string) error {
 	next, err := MustTower(f.state, event)
 	if err != nil {
-		if FanDrivePulse != nil {
-			FanDrivePulse()
-		}
+		// A rejected transition must not drive the fan side; the pulse
+		// only counts an accepted transition into TowerOperating below.
 		return err
 	}
 	prev := f.state
