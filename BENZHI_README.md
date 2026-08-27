@@ -1,6 +1,6 @@
-# HookRelay
+# cooltower
 
-Signed ingress + reliable outbound webhook delivery (retry, circuit breaker, rate limit, DLQ, replay).
+cooltower 是一套工业冷却塔工业过程控制系统，用于风机 VFD 组、喷淋集管流量与过程协调。
 
 ## Requirements
 
